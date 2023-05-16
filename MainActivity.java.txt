@@ -1,0 +1,110 @@
+package com.example.teste;
+
+import android.annotation.SuppressLint;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText nomeEditText;
+    private EditText emailEditText;
+    private EditText cpfEditText;
+    private Button registrarButton;
+
+    private bd databaseHelper;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        nomeEditText = findViewById(R.id.Nome);
+        emailEditText = findViewById(R.id.Email);
+        cpfEditText = findViewById(R.id.CPF);
+        registrarButton = findViewById(R.id.Registrar);
+
+        databaseHelper = bd.Sharedinstance(this);
+
+        registrarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                guardarRegistro();
+            }
+        });
+
+        atualizarListaRegistros();
+    }
+
+    private void guardarRegistro() {
+        String nome = nomeEditText.getText().toString().trim();
+        String email = emailEditText.getText().toString().trim();
+        String cpf = cpfEditText.getText().toString().trim();
+
+        if (nome.isEmpty() || email.isEmpty() || cpf.isEmpty()) {
+            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("Nome", nome);
+        values.put("Email", email);
+        values.put("CPF", cpf);
+        db.insert("TbTeste", null, values);
+
+        nomeEditText.getText().clear();
+        emailEditText.getText().clear();
+        cpfEditText.getText().clear();
+
+        Toast.makeText(this, "Registro salvo com sucesso", Toast.LENGTH_SHORT).show();
+
+        atualizarListaRegistros();
+    }
+
+    private void atualizarListaRegistros() {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM TbTeste", null);
+
+        List<String> registros = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex("_Id"));
+                @SuppressLint("Range") String nome = cursor.getString(cursor.getColumnIndex("Nome"));
+                @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex("Email"));
+                @SuppressLint("Range") String cpf = cursor.getString(cursor.getColumnIndex("CPF"));
+
+                String registro = "ID: " + id + "\n" +
+                        "Nome: " + nome + "\n" +
+                        "Email: " + email + "\n" +
+                        "CPF: " + cpf + "\n";
+
+                registros.add(registro);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        // Exibir os registros na lista (você precisa adicionar um ListView no seu layout XML)
+        ListView registrosListView = findViewById(R.id.registrosListView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, registros);
+        registrosListView.setAdapter(adapter);
+    }
+}

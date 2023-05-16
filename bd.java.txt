@@ -1,0 +1,37 @@
+package com.example.teste;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+//Instanciando Banco de Dados
+public class bd extends SQLiteOpenHelper {
+    private static bd instance = null;
+    private static final int DATABASE_VERSION =1;
+    private static final String DATABASE_NAME ="teste.sqlite";
+    private Context context;
+
+    public bd(Context context){
+            super(context, DATABASE_NAME,null, DATABASE_VERSION);
+    }
+
+    public  static  bd Sharedinstance(Context context){
+        if (instance == null){
+            instance = new bd(context);
+        }
+        return instance;
+    }
+
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+    String query1;
+    query1 = "CREATE TABLE IF NOT EXISTS TbTeste (_Id INTEGER PRIMARY KEY, Nome TEXT NOT NULL, Email TEXT, CPF TEXT)";
+    db.execSQL(query1);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+}

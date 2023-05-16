@@ -1,0 +1,25 @@
+package com.example.teste;
+
+public class pessoa {
+    int _Id;
+    String Nome;
+    String Email;
+    String CPF;
+
+    //getters and setters
+    public int get_Id(){return _Id;}
+
+    public void set_Id(int _Id) {this._Id = _Id;}
+
+    public String getNome() {return Nome;}
+
+    public void setNome(String nome) {Nome = nome;}
+
+    public String getEmail() {return Email;}
+
+    public void setEmail(String email) {Email = email;}
+
+    public String getCPF() {return CPF;}
+
+    public void setCPF(String CPF) {this.CPF = CPF;}
+}
